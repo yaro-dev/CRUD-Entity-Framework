@@ -1,20 +1,74 @@
 using System.Diagnostics;
+using CrudNet8MVC.Datos;
 using CrudNet8MVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrudNet8MVC.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _contexto;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext contexto)
         {
-            _logger = logger;
+            _contexto = contexto;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            return View(await _contexto.Contacto.ToListAsync());
+        }
+
+        [HttpGet]
+        public IActionResult Crear()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Crear(Contacto contacto)
+        {
+            if (ModelState.IsValid)
+            {
+                contacto.FechaCreacion = DateTime.Now;
+
+                _contexto.Contacto.Add(contacto);
+                await _contexto.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Editar(int? id)
+        {
+
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var contacto = _contexto.Contacto.Find(id);
+            if(contacto == null)
+            {
+                return NotFound();
+            }
+
+            return View(contacto);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(Contacto contacto)
+        {
+            if (ModelState.IsValid)
+            {
+                _contexto.Update(contacto);
+                await _contexto.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
             return View();
         }
 

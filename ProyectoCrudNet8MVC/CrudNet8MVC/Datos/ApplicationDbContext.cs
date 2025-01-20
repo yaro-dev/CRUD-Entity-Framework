@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CrudNet8MVC.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CrudNet8MVC.Datos
 {
@@ -9,5 +10,7 @@ namespace CrudNet8MVC.Datos
         {
             
         }
+
+        public DbSet<Contacto> Contacto { get; set; }
     }
 }
